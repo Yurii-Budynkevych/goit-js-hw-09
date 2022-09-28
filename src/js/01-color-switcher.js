@@ -5,13 +5,14 @@ const refs = {
 };
 refs.start.addEventListener('click', onStart);
 refs.stop.addEventListener('click', onStop);
+let timerId;
 function onStart(evt) {
   refs.start.setAttribute('disabled', 'true');
   timerId = setInterval(() => {
     refs.body.style.backgroundColor = getRandomHexColor();
   }, 1000);
 }
-function onStop(evt) {
+function onStop() {
   clearInterval(timerId);
   refs.start.removeAttribute('disabled');
 }
