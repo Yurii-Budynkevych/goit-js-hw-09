@@ -1,4 +1,3 @@
-let intervalId;
 import Notiflix from 'notiflix';
 import 'notiflix/dist/notiflix-3.2.5.min.css';
 const refs = {
@@ -8,18 +7,7 @@ const refs = {
   amount: document.querySelector('#zxc'),
 };
 refs.form.addEventListener('submit', onSubmit);
-
-function onSubmit(evt) {
-  const delay = Number(refs.delay.value);
-  const step = Number(refs.step.value);
-  const amount = Number(refs.amount.value);
-
-  firstDelay(delay, amount);
-  nextDelay(step, amount);
-  evt.preventDefault();
-  evt.currentTarget.reset();
-}
-
+// ________________________________________________________________________________
 function createPromise(position, delay) {
   const shouldResolve = Math.random() > 0.3;
   return new Promise((resolve, reject) => {
@@ -32,13 +20,15 @@ function createPromise(position, delay) {
     }, delay);
   });
 }
+// ________________________________________________________________________________
+function onSubmit(evt) {
+  evt.preventDefault();
+  let firstDelay = Number(refs.delay.value);
+  const step = Number(refs.step.value);
+  const amount = Number(refs.amount.value);
 
-function firstDelay(ms, number) {
-  if (number <= 0) {
-    return;
-  }
-  setTimeout(() => {
-    createPromise(1, ms)
+  for (let index = 1; index <= amount; index++) {
+    createPromise(index, firstDelay)
       .then(({ position, delay }) => {
         Notiflix.Notify.success(
           `✅ Fulfilled promise ${position} in ${delay}ms`
@@ -49,30 +39,8 @@ function firstDelay(ms, number) {
           `❌ Rejected promise ${position} in ${delay}ms`
         );
       });
-  }, ms);
-}
-function nextDelay(ms, number) {
-  if (number <= 1) {
-    return;
+    firstDelay += step;
   }
-  let i = 1;
-  intervalId = setInterval(() => {
-    i += 1;
-    if (i > number) {
-      clearInterval(intervalId);
-      return;
-    }
-    createPromise(i, ms)
-      .then(({ position, delay }) => {
-        Notiflix.Notify.success(
-          `✅ Fulfilled promise ${position} in ${delay}ms`
-        );
-      })
-      .catch(({ position, delay }) => {
-        Notiflix.Notify.failure(
-          `❌ Rejected promise ${position} in ${delay}ms`
-        );
-      });
-  }, ms);
+
+  evt.currentTarget.reset();
 }
-// and the option with "for" below please =)
